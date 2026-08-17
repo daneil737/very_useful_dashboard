@@ -35,12 +35,11 @@ def get_city():
     return (geocode_request.json()[0]["name"], geocode_request.json()[0]["state"])
 
 
-def call_goal_api():
+def call_goal_api(api_url):
     headers = {
         "Authorization" : GOAL_API_KEY
     }
-    url = f"https://api.goal-api.com/v1/teams/cmri4pc28d2lclb07pr43de75/fixtures"
-    response = requests.get(url, headers=headers)
+    response = requests.get(api_url, headers=headers)
     return response.json()['data']
 
 
@@ -61,6 +60,22 @@ def get_last_match(api_response):
             "score": f"{last_match['homeTeamFtScore']}:{last_match['awayTeamFtScore']}"}
 
 
+def get_standings_table_piece(api_response):
+    formated_standings_table = [{
+        "team_position": team["overallLeaguePosition"],
+        "team_name": team["team"]["name"],
+        "matches_played": team["overallLeaguePlayed"],
+        "points": team["overallLeaguePTS"]
+    } for team in api_response]
+    formated_standings_table = [formated_standings_table[0]] + formated_standings_table[10:] + formated_standings_table[1:10]
+    pogon_szczecin_position = int(next(filter(lambda team: team["team_name"] == "Pogoń Szczecin", formated_standings_table))["team_position"])
+
+    if pogon_szczecin_position == 1 or pogon_szczecin_position == 2 or pogon_szczecin_position == 3:
+        return formated_standings_table[:5]
+    elif pogon_szczecin_position == 16 or pogon_szczecin_position == 17 or pogon_szczecin_position == 18:
+        return formated_standings_table[13:]
+    else:
+        return formated_standings_table[pogon_szczecin_position-3:pogon_szczecin_position+2]
 
 @app.route("/")
 def mainpage():
@@ -77,12 +92,17 @@ def mainpage():
     }
 
 
-    goal_api_response = call_goal_api()
-    api_last_match_data = get_last_match(goal_api_response)
-    api_next_match_data = get_next_match(goal_api_response)
+    goal_fixtures_api_response = call_goal_api("https://api.goal-api.com/v1/teams/cmri4pc28d2lclb07pr43de75/fixtures")
+    api_last_match_data = get_last_match(goal_fixtures_api_response)
+    api_next_match_data = get_next_match(goal_fixtures_api_response)
 
+
+    goal_standings_api_response = call_goal_api("https://api.goal-api.com/v1/standings/cmr77dw8j00gerx06xvshbkow")
+    api_standings_table_piece = get_standings_table_piece(goal_standings_api_response)
+    
     
     return render_template("index.html",
                            weather_data=api_weather_data,
                            last_match_data=api_last_match_data,
-                           next_match_data=api_next_match_data)
+                           next_match_data=api_next_match_data,
+                           standings_table_piece=api_standings_table_piece)
