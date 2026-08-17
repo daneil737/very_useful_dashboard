@@ -1,12 +1,19 @@
 <!doctype html>
 <html>
   <head>
-    <title>This is the title of the webpage!</title>
+    <title>Very useful dashboard</title>
     <link rel="stylesheet" href="..\static\style.css">
   </head>
   <body>
     <div id="container">
-        <div class="dashboard-tiles">{{ temperature }}</div>
+        <div class="dashboard-tiles">
+		<div class="tile-title">Weather forecast for {{ weather_data.city }}, {{ weather_data.state }}</div>
+			<p>
+				Temperature: {{ weather_data.temperature }}&#176;C</br>
+				Rain: {{ weather_data.rain }}mm</br>
+				Wind: {{ weather_data.wind }}m/s {{ weather_data.wind_dir }}</br>
+			</p>
+		</div>
 	<div class="dashboard-tiles">b</div>
 	<div class="dashboard-tiles">c</div>
 	<div class="dashboard-tiles">d</div>
