@@ -31,7 +31,14 @@
 				{{ next_match_data.date }}, {{ next_match_data.time }}
 			</p>
 	</div>
-	<div class="dashboard-tiles">pogon standings</div>
+	<div class="dashboard-tiles league-standings">
+		<table>
+			<tr><td>position</td><td>name</td><td>matches played</td><td>points</td></tr>
+			{% for team in standings_table_piece %}
+			<tr><td>{{team.team_position }}</td><td>{{team.team_name }}</td><td>{{team.matches_played }}</td><td>{{team.points }}</td></tr>
+			{% endfor %}
+		</table>
+	</div>
 	<div class="dashboard-tiles">togoodtogo</div>
 	<div class="dashboard-tiles">h</div>
 	<div class="dashboard-tiles">i</div>

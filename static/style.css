@@ -17,6 +17,12 @@ body {
 	padding: 20px;
 }
 
+
 .tile-title {
 	color: rgb(191 191 191);
+}
+
+
+table, th, td {
+  border: 1px solid black;
 }
