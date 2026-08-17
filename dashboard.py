@@ -1,5 +1,11 @@
 from flask import Flask, render_template
 import requests
+import os
+
+
+GOAL_API_KEY = os.environ["GOAL_API_KEY"]
+GEOCODE_API_KEY = os.environ["GEOCODE_API_KEY"]
+
 
 app = Flask(__name__)
 
@@ -27,20 +33,23 @@ def get_weather():
 def get_city():
     LAT = 53.5484398
     LONG = -2.522554
-    API_KEY="76828ae745a0d53168c90ade45ca334d"
-    api_call_str = f"http://api.openweathermap.org/geo/1.0/reverse?lat={LAT}&lon={LONG}&limit=2&appid={API_KEY}"
+    api_call_str = f"http://api.openweathermap.org/geo/1.0/reverse?lat={LAT}&lon={LONG}&limit=2&appid={GEOCODE_API_KEY}"
     geocode_request = requests.get(api_call_str)
     return (geocode_request.json()[0]["name"], geocode_request.json()[0]["state"])
 
 
 @app.route("/")
-def mainpage(temperature=None, rain=None, wind=None, wind_direction=None, city=None, state=None):
+def mainpage():
     api_temperature, api_rain, api_wind, api_wind_dir = get_weather()
     api_city, api_state = get_city()
-    return render_template("index.html",
-                           temperature=api_temperature,
-                           rain=api_rain,
-                           wind=api_wind,
-                           wind_dir=api_wind_dir,
-                           city=api_city,
-                           state=api_state)
+
+    api_weather_data = {
+        "city": api_city,
+        "state": api_state,
+        "temperature": api_temperature,
+        "rain": api_rain,
+        "wind": api_wind,
+        "wind_direction": api_wind_dir
+    }
+    
+    return render_template("index.html", weather_data=api_weather_data)
