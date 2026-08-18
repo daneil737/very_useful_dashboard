@@ -15,7 +15,17 @@
 			</p>
 		</div>
 	<div class="dashboard-tiles">b</div>
-	<div class="dashboard-tiles">zditm next bus</div>
+	<div class="dashboard-tiles">
+		<div class="tile-title">Przystanek Lucznicza</div>
+		<p>
+			<table>
+				<tr><td>bus number</td><td>bus direction</td><td>estimated departure</td></tr>
+				{% for departure in stop_departures_table %}
+				<tr><td>{{ departure.bus_number }}</td><td>{{ departure.bus_direction }}</td><td>{{ departure.estimated_departure_time }}</td></tr>
+				{% endfor %}
+			</table>
+		</p>
+	</div>
 	<div class="dashboard-tiles">
 		<div class="tile-title">Last Pogon Szczecin match</div>
 			<p>

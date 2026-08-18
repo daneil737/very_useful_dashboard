@@ -77,6 +77,19 @@ def get_standings_table_piece(api_response):
     else:
         return formated_standings_table[pogon_szczecin_position-3:pogon_szczecin_position+2]
 
+
+def call_zditm_api():
+    url = "https://www.zditm.szczecin.pl/api/v2/departure-boards/15111?limit=6&format=json"
+    stop_departures_table = requests.get(url)
+    stop_departures_table = stop_departures_table.json()['data']['departures']
+    formatted_departures_table = [{
+        "bus_number": departure['line']['number'],
+        "bus_direction": departure['trip']['headsign']['short'],
+        "estimated_departure_time": departure['departure_time']['estimated'].split('T')[-1][:5]
+    } for departure in stop_departures_table]
+    return formatted_departures_table
+
+
 @app.route("/")
 def mainpage():
     api_temperature, api_rain, api_wind, api_wind_dir = get_weather()
@@ -99,10 +112,13 @@ def mainpage():
 
     goal_standings_api_response = call_goal_api("https://api.goal-api.com/v1/standings/cmr77dw8j00gerx06xvshbkow")
     api_standings_table_piece = get_standings_table_piece(goal_standings_api_response)
-    
+
+
+    api_stop_departures_table = call_zditm_api()
     
     return render_template("index.html",
                            weather_data=api_weather_data,
+                           stop_departures_table=api_stop_departures_table,
                            last_match_data=api_last_match_data,
                            next_match_data=api_next_match_data,
                            standings_table_piece=api_standings_table_piece)
