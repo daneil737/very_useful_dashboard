@@ -1,10 +1,14 @@
 from flask import Flask, render_template
 import requests
+import base64
+from io import BytesIO
+from PIL import Image
 import os
 
 
 GOAL_API_KEY = os.environ["GOAL_API_KEY"]
 GEOCODE_API_KEY = os.environ["GEOCODE_API_KEY"]
+TOMTOM_API_KEY = os.environ["TOMTOM_API_KEY"]
 LAT = 53.5484398
 LONG = -2.522554
 
@@ -90,6 +94,25 @@ def call_zditm_api():
     return formatted_departures_table
 
 
+def call_tomtom_api():
+    headers = {
+        'accept': 'image/png',
+        'Accept-Language': 'en-US,en,hi-Deva;q=0.9',
+        'TomTom-Api-Version': '2'
+    }
+
+    url_roads = f'https://api.tomtom.com/maps/orbis/display/raster/tile/13/4427/2651?apiVersion=2&tileSize=256&key={TOMTOM_API_KEY}'
+    url_traffic = f'https://api.tomtom.com/maps/orbis/traffic/flow/raster/tile/13/4427/2651?tileSize=256&apiVersion=2&key={TOMTOM_API_KEY}'
+    response_roads = requests.get(url_roads, headers=headers)
+    response_traffic  = requests.get(url_traffic, headers=headers)
+    roads_img = Image.open(BytesIO(response_roads._content)).convert("RGBA")
+    traffic_img = Image.open(BytesIO(response_traffic._content)).convert("RGBA")
+    graph = Image.alpha_composite(roads_img, traffic_img)
+    buffer = BytesIO()
+    graph.save(buffer, format="PNG")
+    graph_base64 = base64.b64encode(buffer.getvalue()).decode("utf-8")
+    return graph_base64
+    
 @app.route("/")
 def mainpage():
     api_temperature, api_rain, api_wind, api_wind_dir = get_weather()
@@ -115,10 +138,13 @@ def mainpage():
 
 
     api_stop_departures_table = call_zditm_api()
+
+    api_traffic_graph = call_tomtom_api()
     
     return render_template("index.html",
                            weather_data=api_weather_data,
                            stop_departures_table=api_stop_departures_table,
                            last_match_data=api_last_match_data,
                            next_match_data=api_next_match_data,
-                           standings_table_piece=api_standings_table_piece)
+                           standings_table_piece=api_standings_table_piece,
+                           traffic_graph=api_traffic_graph)
