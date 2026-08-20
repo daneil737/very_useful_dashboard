@@ -1,60 +1,69 @@
 <!doctype html>
 <html>
-  <head>
-    <title>Very useful dashboard</title>
-    <link rel="stylesheet" href="..\static\style.css">
-  </head>
-  <body>
-    <div id="container">
-        <div class="dashboard-tiles">
-		<div class="tile-title">Weather forecast for {{ weather_data.city }}, {{ weather_data.state }}</div>
-			<p>
-				Temperature: {{ weather_data.temperature }}&#176;C</br>
-				Rain: {{ weather_data.rain }}mm</br>
-				Wind: {{ weather_data.wind }}m/s {{ weather_data.wind_dir }}</br>
-			</p>
-		</div>
-	<div class="dashboard-tiles">b</div>
-	<div class="dashboard-tiles">
-		<div class="tile-title">Przystanek Lucznicza</div>
-		<p>
-			<table>
-				<tr><td>bus number</td><td>bus direction</td><td>estimated departure</td></tr>
+	<head>
+		<title>Very useful dashboard</title>
+		<link rel="stylesheet" href="..\static\style.css">
+	</head>
+	<body>
+		<script src="https://kit.fontawesome.com/90043d3030.js" crossorigin="anonymous"></script>
+		<div id="container">
+		<div id="bus-stop-timetable">
+			<div class="tile-title">Przystanek Lucznicza</div>
+			<div id="timetable">
 				{% for departure in stop_departures_table %}
-				<tr><td>{{ departure.bus_number }}</td><td>{{ departure.bus_direction }}</td><td>{{ departure.estimated_departure_time }}</td></tr>
+				<div>{{ departure.bus_number }}</div><div>{{ departure.bus_direction }}</div><div>{{ departure.estimated_departure_time }}</div>
 				{% endfor %}
-			</table>
-		</p>
-	</div>
-	<div class="dashboard-tiles">
-		<div class="tile-title">Last Pogon Szczecin match</div>
-			<p>
-				{{ last_match_data.home_team }} vs {{ last_match_data.away_team }}</br>
-				{{ last_match_data.score }}</br>
-				{{ last_match_data.date }}, {{ last_match_data.time }}
-			</p>
-	</div>
-	<div class="dashboard-tiles">
-		<div class="tile-title">Next Pogon Szczecin match</div>
-			<p>
-				{{ next_match_data.home_team }} vs {{ next_match_data.away_team }}</br>
-				{{ next_match_data.date }}, {{ next_match_data.time }}
-			</p>
-	</div>
-	<div class="dashboard-tiles league-standings">
-		<table>
-			<tr><td>position</td><td>name</td><td>matches played</td><td>points</td></tr>
-			{% for team in standings_table_piece %}
-			<tr><td>{{team.team_position }}</td><td>{{team.team_name }}</td><td>{{team.matches_played }}</td><td>{{team.points }}</td></tr>
-			{% endfor %}
-		</table>
-	</div>
-	<div class="dashboard-tiles">togoodtogo</div>
-	<div class="dashboard-tiles">
-		<div class="tile-title">Traffic graph</div>
-		<img src="data:image/png;base64,{{ traffic_graph }}">
-	</div>
-	<div class="dashboard-tiles">i</div>
+			</div>
+		</div>
+		<div id="last-match">
+			<div class="tile-title">Last Pogon Szczecin match</div>
+			<div id="last-match-board">
+				<div id="last-match-time">{{ last_match_data.date }}, {{ last_match_data.time }}</div>
+				<div>
+					{{ last_match_data.home_team }}</br>
+					<img src={{last_match_data.home_team_badge}} width="60" height="60">
+				</div>
+				<div>vs</div>
+				<div>
+					{{ last_match_data.away_team }}</br>
+					<img src={{last_match_data.away_team_badge}} width="60" height="60">
+				</div>
+				<div id="last-match-score">{{ last_match_data.score }}</div>
+			</div>
+		</div>
+		<div id="traffic-graph">
+			<div class="tile-title">Traffic graph</div>
+			<img src="data:image/png;base64,{{ traffic_graph }}">
+		</div>
+		<div id="next-match">
+			<div class="tile-title">Next Pogon Szczecin match</div>
+			<div id="next-match-board">
+				<div id="next-match-time">{{ next_match_data.date }}, {{ next_match_data.time }}</div>
+				<div>{{ next_match_data.home_team }}</br>
+				<img src={{next_match_data.home_team_badge}} width="60" height="60">
+				</div>
+				<div>vs</div>
+				<div>{{ next_match_data.away_team }}</br>
+				<img src={{next_match_data.away_team_badge}} width="60" height="60">
+				</div>
+			</div>
+		</div>
+		<div id="league-standings">
+			<div class="tile-title">Ekstraklasa standings</div>
+			<div id="league-table">
+				<div>Club</div><div>MP</div><div>PTS</div>
+				{% for team in standings_table_piece %}
+				<div>{{team.team_position }} {{team.team_name }}</div><div>{{team.matches_played }}</div><div>{{team.points }}</div>
+				{% endfor %}
+			</div>
+		</div>
+		<div id="weather-forecast">
+			<div class="tile-title">Weather forecast for {{ weather_data.city }}, {{ weather_data.state }}</div>
+			<div><i class="fa-solid fa-temperature-high fa-xl"></i> {{ weather_data.temperature }}&#176;C</br></div>
+			<div><i class="fa-solid fa-cloud-showers-heavy fa-xl"></i> {{ weather_data.rain }}mm</br></div>
+			<div><i class="fa-solid fa-wind fa-xl"></i> {{ weather_data.wind }}m/s </br></div>
+			<div><i class="fa-regular fa-compass fa-xl"></i> {{ weather_data.wind_direction }}</div>
+		</div>
     </div>
-  </body>
+	</body>
 </html>

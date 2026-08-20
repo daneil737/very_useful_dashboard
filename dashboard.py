@@ -4,7 +4,7 @@ import base64
 from io import BytesIO
 from PIL import Image
 import os
-
+from unidecode import unidecode
 
 GOAL_API_KEY = os.environ["GOAL_API_KEY"]
 GEOCODE_API_KEY = os.environ["GEOCODE_API_KEY"]
@@ -21,7 +21,6 @@ def get_weather():
     rain = weather_request.json()["current"]["rain"]
     wind = weather_request.json()["current"]["wind_speed_10m"]
     wind_direction_deg = weather_request.json()["current"]["wind_direction_10m"]
-
     if wind_direction_deg >=337  or wind_direction_deg < 22: wind_direction = "North"
     elif wind_direction_deg < 67: wind_direction = "North-East"
     elif wind_direction_deg < 112: wind_direction = "East"
@@ -47,12 +46,31 @@ def call_goal_api(api_url):
     return response.json()['data']
 
 
+def get_team_badge_link(team_name):
+    team_name = team_name.lower().split(" ")
+    team_name = "-".join(team_name)
+    '''team_name.replace("ą","a")
+    team_name.replace("ć","c")
+    team_name.replace("ę","e")
+    team_name.replace("ł","l")
+    team_name.replace("ń","n")
+    team_name.replace("ó","o")
+    team_name.replace("ś","s")
+    team_name.replace("ź","z")
+    team_name.replace("ż","z")'''
+    team_name = unidecode(team_name)
+    print(team_name)
+    link = f"https://assets.footylogos.com/logos/{team_name}/{team_name}-logo-footylogos.png"
+    return link
+
 def get_next_match(api_response):
     next_match = [match for match in api_response if match['matchStatus'] == "SCHEDULED"][-1]
     return {"date": next_match['matchDate'],
             "time": next_match['matchTime'],
             "home_team": next_match['homeTeam']['name'],
-            "away_team": next_match['awayTeam']['name']}
+            "away_team": next_match['awayTeam']['name'],
+            "home_team_badge": get_team_badge_link(next_match['homeTeam']['name']),
+            "away_team_badge": get_team_badge_link(next_match['awayTeam']['name'])}
 
 
 def get_last_match(api_response):
@@ -61,6 +79,8 @@ def get_last_match(api_response):
             "time": last_match['matchTime'],
             "home_team": last_match['homeTeam']['name'],
             "away_team": last_match['awayTeam']['name'],
+            "home_team_badge": get_team_badge_link(last_match['homeTeam']['name']),
+            "away_team_badge": get_team_badge_link(last_match['awayTeam']['name']),
             "score": f"{last_match['homeTeamFtScore']}:{last_match['awayTeamFtScore']}"}
 
 
@@ -101,15 +121,16 @@ def call_tomtom_api():
         'TomTom-Api-Version': '2'
     }
 
-    url_roads = f'https://api.tomtom.com/maps/orbis/display/raster/tile/13/4427/2651?apiVersion=2&tileSize=256&key={TOMTOM_API_KEY}'
-    url_traffic = f'https://api.tomtom.com/maps/orbis/traffic/flow/raster/tile/13/4427/2651?tileSize=256&apiVersion=2&key={TOMTOM_API_KEY}'
+    url_roads = f'https://api.tomtom.com/maps/orbis/display/raster/tile/13/4427/2651?apiVersion=2&tileSize=512&key={TOMTOM_API_KEY}'
+    url_traffic = f'https://api.tomtom.com/maps/orbis/traffic/flow/raster/tile/13/4427/2651?tileSize=512&apiVersion=2&key={TOMTOM_API_KEY}'
     response_roads = requests.get(url_roads, headers=headers)
     response_traffic  = requests.get(url_traffic, headers=headers)
     roads_img = Image.open(BytesIO(response_roads._content)).convert("RGBA")
     traffic_img = Image.open(BytesIO(response_traffic._content)).convert("RGBA")
     graph = Image.alpha_composite(roads_img, traffic_img)
+    graph_resized = graph.resize((400, 400))
     buffer = BytesIO()
-    graph.save(buffer, format="PNG")
+    graph_resized.save(buffer, format="PNG")
     graph_base64 = base64.b64encode(buffer.getvalue()).decode("utf-8")
     return graph_base64
     
