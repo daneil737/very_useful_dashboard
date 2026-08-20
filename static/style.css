@@ -1,27 +1,96 @@
 body {
-	background-color: rgb(245 243 229);
+	background-color: rgb(84 114 109);
+	font-size: 11pt;
+	font-family: "Lucida Console";
 }
 
 #container {
-	min-height: 100vh;
 	min-width: 100%;
 	display: grid;
-	grid-template-columns: 1fr 1fr 1fr;
-	grid-template-rows: 1fr 1fr 1fr;
-	gap: 10px 10px;
+	grid-template-columns: max-content max-content min-content min-content;
+	grid-template-rows: min-content min-content min-content min-content;
+	gap: 6px;
 }
 
 
 #container > div {
-	background-color: white;
-	padding: 20px;
+	background-color: rgb(237 233 228);
+	padding: 6px;
+	border: solid 2px rgb(187 183 188);
+	border-radius: 10px;
 }
 
 
 .tile-title {
-	color: rgb(191 191 191);
+	color: rgb(84 114 109);
+	font-size: 14pt;
+	font-weight: 780;
 }
 
+#bus-stop-timetable {
+	grid-row: span 2 / span 2;
+}
+
+#timetable {
+	display: grid;
+	grid-template-columns: max-content max-content min-content;
+	grid-template-rows: repeat(6, 1fr);
+	font-size: 8pt;
+	gap: 2px;
+	justify-content: start;
+	align-content: center;
+	padding: 10px;
+}
+
+#timetable > div {
+	background-color: black;
+	color: yellow;
+	padding: 4px 16px;
+}
+
+#league-table {
+	display: grid;
+	grid-template-columns: max-content min-content min-content;
+	grid-template-rows: repeat(6, 1fr);
+	padding: 10px;
+	gap: 2px 1px;
+	font-size: 8pt;
+	justify-content: start;
+	align-content: center;
+}
+
+#league-table > div {
+	background-color: rgb(0 28 167);
+	color: white;
+	padding: 4px 16px;
+	place-self: center stretch;
+}
+
+#togoodtogo {
+	grid-row: span 2 / span 2;
+	grid-column-start: 1;
+	grid-row-start: 3;
+}
+
+#traffic-graph{
+	grid-row: span 4 / span 4;
+}
+
+#league-standings{
+	grid-row: span 2 / span 2;
+	grid-row-start: 3;
+}
+
+#next-match {
+	grid-column-start: 2;
+	grid-row-start: 2;
+}
+
+#weather-forecast{
+	grid-row: span 4 / span 4;
+    	grid-column-start: 4;
+    	grid-row-start: 1;
+}
 
 table, th, td {
   border: 1px solid black;
